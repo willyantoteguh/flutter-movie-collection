@@ -1,17 +1,15 @@
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_movie/data/models/response/genre.dart';
-import 'package:flutter_movie/presentation/movie/genre_bloc/genre_bloc.dart';
-import 'package:flutter_movie/presentation/movie/screens/movie_detail_screen.dart';
 
 import '../../../common/components/loading_indicator.dart';
 import '../../../data/models/request/movie_request.dart';
+import '../../../data/models/response/genre.dart';
 import '../../../data/models/response/movie.dart';
+import '../genre_bloc/genre_bloc.dart';
 import '../movie_bloc/movie_bloc.dart';
+import 'movie_detail_screen.dart';
 
 class MovieScreen extends StatefulWidget {
   const MovieScreen({super.key});
@@ -95,9 +93,9 @@ class _MovieScreenState extends State<MovieScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: buildInputField(
-                            hintText: "Search Now...",
-                            controller: searchController,
-                            ),
+                          hintText: "Search Now...",
+                          controller: searchController,
+                        ),
                       ),
                       SizedBox(
                         // height: MediaQuery.of(context).size.height,
@@ -138,23 +136,34 @@ class _MovieScreenState extends State<MovieScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: [
-                                            Wrap(
-                                              children:
-                                                  movie.genreIds.map<Widget>((e) {
-                                                var genre = listGenreFromResult
-                                                    .firstWhere((element) =>
-                                                        element.id == e);
-                                      
-                                                return Card(
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(6.0),
-                                                    child: Text(
-                                                        genre.name.toString()),
-                                                  ),
+                                            BlocBuilder<MovieBloc, MovieState>(
+                                                builder: (context, state) {
+                                              return state.maybeWhen(
+                                                  orElse: () {
+                                                return Wrap(
+                                                  children: movie.genreIds
+                                                      .map<Widget>((e) {
+                                                    var genre =
+                                                        listGenreFromResult
+                                                            .firstWhere(
+                                                                (element) =>
+                                                                    element
+                                                                        .id ==
+                                                                    e);
+
+                                                    return Card(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(6.0),
+                                                        child: Text(genre.name
+                                                            .toString()),
+                                                      ),
+                                                    );
+                                                  }).toList(),
                                                 );
-                                              }).toList(),
-                                            ),
+                                              });
+                                            }),
                                           ],
                                         ),
                                       ),
